@@ -1,13 +1,16 @@
 import React, { useState } from 'react';
-import { f1, f2, f3, f4 } from './functions';
+import { add, divide, multiply, subtract } from './functions';
 
 const App = () => {
   const [numA, setNumA] = useState<number>(0);
   const [numB, setNumB] = useState<number>(0);
-  const [numC, setNumC] = useState<number | string>(0);
+  const [result, setResult] = useState<number | string>(0);
+  const [error, setError] = useState('')
 
-  const doWork = (func: (a: number, b: number) => number) => {
-    setNumC(func(numA, numB));
+  const calulateResult = (func: (a: number, b: number) => CalculationResult) => {
+    const calcResult = func(numA, numB);
+    setResult(calcResult.error ? 0 : calcResult.result);
+    setError(calcResult.error || '');
   };
 
   return (
@@ -27,34 +30,33 @@ const App = () => {
         />
       </div>
       <div className="grid grid-cols-4 gap-x-4 my-4">
-        <button
-          className="bg-blue-200 px-2 py-4 text-lg hover:bg-blue-500 hover:text-white rounded-md"
-          onClick={() => doWork(f1)}
-        >
-          +
-        </button>
-        <button
-          className="bg-blue-200 px-2 py-4 text-lg hover:bg-blue-500 hover:text-white rounded-md"
-          onClick={() => doWork(f2)}
-        >
-          -
-        </button>
-        <button
-          className="bg-blue-200 px-2 py-4 text-lg hover:bg-blue-500 hover:text-white rounded-md"
-          onClick={() => doWork(f3)}
-        >
-          *
-        </button>
-        <button
-          className="bg-blue-200 px-2 py-4 text-lg hover:bg-blue-500 hover:text-white rounded-md"
-          onClick={() => doWork(f4)}
-        >
-          /
-        </button>
+        <Button onClick={() => calulateResult(add)}>+</Button>
+        <Button onClick={() => calulateResult(subtract)}>-</Button>
+        <Button onClick={() => calulateResult(multiply)}>*</Button>
+        <Button onClick={() => calulateResult(divide)}>/</Button>
       </div>
-      <div>Result: {numC}</div>
+      <div>Result: {result}</div>
+      <div>{error}</div>
     </div>
   );
 };
 
 export default App;
+
+type ButtonProps = {
+  onClick: () => void;
+  children: React.ReactNode;
+};
+
+const Button = ({ children, onClick }: ButtonProps) => {
+  return (
+    <button onClick={onClick} className="bg-blue-200 px-2 py-4 text-lg hover:bg-blue-500 hover:text-white rounded-md">
+      {children}
+    </button>
+  );
+}
+
+export type CalculationResult = {
+  result: number;
+  error?: string;
+};
